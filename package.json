@@ -1,21 +1,25 @@
 {
   "name": "netatmo-zipabox-dispatch",
   "description": "Virtual Thermostat middleware to connect netatmo with zipabox",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "author": {
     "name": "Thomas Malt",
     "email": "thomas@malt.no",
     "url": "https://malt.no/"
   },
-  "repository": "",
+  "repository": "https://github.com/tfmalt/netatmo-zipabox-dispatcher.git",
   "license": "MIT",
   "dependencies": {
-    "logging": "^2.0.21"
+    "logging": "^2.0.21",
+    "request": "^2.79.0"
   },
   "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-jshint": "^2.0.4",
+    "gulp-watch": "^4.3.11",
     "jshint": "^2.9.4"
   },
   "jshintConfig": {
     "esversion": 6
-  } 
+  }
 }
