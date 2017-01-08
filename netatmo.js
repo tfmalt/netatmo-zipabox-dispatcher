@@ -14,9 +14,10 @@ const NetatmoCtrl  = require('./lib/NetatmoCtrl');
 const pkg          = require('./package');
 const zipcfg       = require('./zipabox');
 const request      = require('request');
+const jsonfile     = require('jsonfile');
+
 
 log("Starting Netatmo Zipabox Dispatcher v" + pkg.version);
-log(zipcfg);
 
 const netatmo = new NetatmoCtrl({
     verbose:       (process.env.NETATMO_VERBOSE == 1) ? true : false,
@@ -37,15 +38,23 @@ zip.sendUpdate = function (data) {
         zipcfg.Humidity + "=" + data.Humidity + "&" + 
         zipcfg.CO2 + "=" + data.CO2;
 
-    log(url);
+    // log(url);
+
+    let res = request.get(url, (error, response, body) => {
+        log("Did zipabox update ${response.statusCode}");
+        log(body);
+    });
 };
 
-
-netatmo.start();
 netatmo.on("update", (data) => {
     let room = data.body.devices[0];
     log("got data:", room.module_name, room.dashboard_data);
     zip.sendUpdate(room.dashboard_data);
 });
 
+netatmo.on("access_token", (data) => {
+    log("got access token:", data);
+});
+
+netatmo.start();
 
