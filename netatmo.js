@@ -10,23 +10,22 @@
  */
 
 
-const log = require("logging");
-const NetatmoCtrl = require("./lib/NetatmoCtrl");
-const pkg = require("./package");
-const zipcfg = require("./zipabox");
+const log     = require("logging");
+const nc      = require("./lib/netatmo-connector");
+const pkg     = require("./package");
+const zipcfg  = require("./zipabox");
 const request = require("request");
-const jsonfile = require("jsonfile");
 
 log("Starting Netatmo Zipabox Dispatcher v" + pkg.version);
 
-const netatmo = new NetatmoCtrl({
-    verbose: (process.env.NETATMO_VERBOSE == 1) ? true : false,
-    interval: process.env.NETATMO_INTERVAL || 30,
-    grant_type: process.env.NETATMO_GRANT_TYPE,
-    username: process.env.NETATMO_USERNAME,
-    password: process.env.NETATMO_PASSWORD,
-    client_id: process.env.NETATMO_CLIENT_ID,
-    client_secret: process.env.NETATMO_CLIENT_SECRET
+const netatmo = new nc.NetatmoController({
+  verbose: (process.env.NETATMO_VERBOSE == 1) ? true : false,
+  interval: process.env.NETATMO_INTERVAL || 30,
+  grant_type: process.env.NETATMO_GRANT_TYPE,
+  username: process.env.NETATMO_USERNAME,
+  password: process.env.NETATMO_PASSWORD,
+  client_id: process.env.NETATMO_CLIENT_ID,
+  client_secret: process.env.NETATMO_CLIENT_SECRET
 });
 
 const zip = {};
