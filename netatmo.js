@@ -1,46 +1,44 @@
 #!/usr/bin/env node
+
 /**
- * Service polling a netatmo weather station to update virtual meters and 
+ * Service polling a netatmo weather station to update virtual meters and
  * sensor endpoints on a zipabox.
  *
  * @author Thomas Malt <thomas@malt.no>
  * @copyright 2017 (c) Thomas malt <thomas@malt.no>
- * @licence MIT
+ * @license MIT
  */
 
 
-const log          = require('logging');
-const NetatmoCtrl  = require('./lib/NetatmoCtrl');
-const pkg          = require('./package');
-const zipcfg       = require('./zipabox');
-const request      = require('request');
-const jsonfile     = require('jsonfile');
-
+const log = require("logging");
+const NetatmoCtrl = require("./lib/NetatmoCtrl");
+const pkg = require("./package");
+const zipcfg = require("./zipabox");
+const request = require("request");
+const jsonfile = require("jsonfile");
 
 log("Starting Netatmo Zipabox Dispatcher v" + pkg.version);
 
 const netatmo = new NetatmoCtrl({
-    verbose:       (process.env.NETATMO_VERBOSE == 1) ? true : false,
-    interval:      process.env.NETATMO_INTERVAL || 30,
-    grant_type:    process.env.NETATMO_GRANT_TYPE,
-    username:      process.env.NETATMO_USERNAME,
-    password:      process.env.NETATMO_PASSWORD,
-    client_id:     process.env.NETATMO_CLIENT_ID,
-    client_secret: process.env.NETATMO_CLIENT_SECRET 
+    verbose: (process.env.NETATMO_VERBOSE == 1) ? true : false,
+    interval: process.env.NETATMO_INTERVAL || 30,
+    grant_type: process.env.NETATMO_GRANT_TYPE,
+    username: process.env.NETATMO_USERNAME,
+    password: process.env.NETATMO_PASSWORD,
+    client_id: process.env.NETATMO_CLIENT_ID,
+    client_secret: process.env.NETATMO_CLIENT_SECRET
 });
 
 const zip = {};
-zip.sendUpdate = function (data) {
-    let url = zipcfg.baseurl + "&" + 
+zip.sendUpdate = function(data) {
+    let url = zipcfg.baseurl + "&" +
         zipcfg.Temperature + "=" + data.Temperature + "&" +
         zipcfg.Pressure + "=" + data.Pressure + "&" +
         zipcfg.Noise + "=" + data.Noise + "&" +
-        zipcfg.Humidity + "=" + data.Humidity + "&" + 
+        zipcfg.Humidity + "=" + data.Humidity + "&" +
         zipcfg.CO2 + "=" + data.CO2;
 
-    // log(url);
-
-    let res = request.get(url, (error, response, body) => {
+    request.get(url, (error, response, body) => {
         log("Did zipabox update ${response.statusCode}");
         log(body);
     });
@@ -57,4 +55,3 @@ netatmo.on("access_token", (data) => {
 });
 
 netatmo.start();
-
