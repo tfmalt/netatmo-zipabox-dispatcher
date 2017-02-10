@@ -1,7 +1,7 @@
 {
   "name": "netatmo-zipabox-dispatch",
   "description": "Virtual Thermostat middleware to connect netatmo with zipabox",
-  "version": "1.0.5",
+  "version": "1.2.0",
   "author": {
     "name": "Thomas Malt",
     "email": "thomas@malt.no",

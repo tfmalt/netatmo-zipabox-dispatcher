@@ -38,19 +38,24 @@ zip.sendUpdate = function(data) {
         zipcfg.CO2 + "=" + data.CO2;
 
     request.get(url, (error, response, body) => {
-        log("Did zipabox update ${response.statusCode}");
-        log(body);
+        log(`Did zipabox update: ${response.statusCode}`, body);
     });
 };
 
 netatmo.on("update", (data) => {
     let room = data.body.devices[0];
-    log("got data:", room.module_name, room.dashboard_data);
+    log(
+        "got data from ", room.module_name,
+        ", temp:", room.dashboard_data.Temperature
+    );
     zip.sendUpdate(room.dashboard_data);
 });
 
 netatmo.on("access_token", (data) => {
-    log("got access token:", data);
+    log("got access token: success");
+    if (netatmo.options.verbose) {
+        log("  token data:", data);
+    }
 });
 
 netatmo.start();
