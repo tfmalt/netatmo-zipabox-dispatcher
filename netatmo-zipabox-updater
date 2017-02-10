@@ -10,17 +10,27 @@
  */
 
 
-const log     = require("logging");
+const log     = require("winston");
 const nc      = require("./lib/netatmo-connector");
 const pkg     = require("./package");
 const zipcfg  = require("./zipabox");
 const request = require("request");
 
-log("Starting Netatmo Zipabox Dispatcher v" + pkg.version);
+log.remove(log.transports.Console);
+log.add(log.transports.Console, {
+    level: (process.env.NETATMO_VERBOSE == 1) ? "debug" : "info",
+    prettyPrint: true,
+    colorize: true,
+    silent: false,
+    timestamp: false
+});
+log.cli();
+log.info("Starting Netatmo Zipabox Dispatcher v" + pkg.version);
+log.debug("  Log level debug");
 
 const netatmo = new nc.NetatmoController({
     verbose: (process.env.NETATMO_VERBOSE == 1) ? true : false,
-    interval: process.env.NETATMO_INTERVAL || 30,
+    interval: process.env.NETATMO_REQ_INTERVAL || 30,
     grant_type: process.env.NETATMO_GRANT_TYPE,
     username: process.env.NETATMO_USERNAME,
     password: process.env.NETATMO_PASSWORD,
@@ -38,24 +48,39 @@ zip.sendUpdate = function(data) {
         zipcfg.CO2 + "=" + data.CO2;
 
     request.get(url, (error, response, body) => {
-        log(`Did zipabox update: ${response.statusCode}`, body);
+        log.log('info', `zipabox: did update: ${response.statusCode}`, body);
+        if (response.statusCode == 200) {
+            netatmo.currentTemp = data.Temperature;
+        }
     });
 };
 
 netatmo.on("update", (data) => {
+    if (typeof(data.body.devices) === "undefined") {
+        log.error("netatmo: got undefined data:", data);
+        return;
+    }
     let room = data.body.devices[0];
-    log(
-        "got data from ", room.module_name,
-        ", temp:", room.dashboard_data.Temperature
+
+    if (typeof(netatmo.currentTemp) === "undefined") {
+        netatmo.currentTemp = 0;
+    }
+
+    log.info(
+        "netatmo: got data from", room.module_name,
+        ", temp:", room.dashboard_data.Temperature,
+        ", currentTemp:", netatmo.currentTemp
+
     );
-    zip.sendUpdate(room.dashboard_data);
+
+    if (room.dashboard_data.Temperature != netatmo.currentTemp) {
+        zip.sendUpdate(room.dashboard_data);
+    }
 });
 
 netatmo.on("access_token", (data) => {
-    log("got access token: success");
-    if (netatmo.options.verbose) {
-        log("  token data:", data);
-    }
+    log.info("got access token: success");
+    log.debug(data);
 });
 
 netatmo.start();
