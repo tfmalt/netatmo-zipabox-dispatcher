@@ -1,7 +1,7 @@
 {
   "name": "netatmo-zipabox-dispatch",
   "description": "Virtual Thermostat middleware to connect netatmo with zipabox",
-  "version": "1.2.2",
+  "version": "1.2.4",
   "author": {
     "name": "Thomas Malt",
     "email": "thomas@malt.no",
@@ -19,6 +19,9 @@
     "gulp-jshint": "^2.0.4",
     "gulp-watch": "^4.3.11",
     "jshint": "^2.9.4"
+  },
+  "bin": {
+      "netatmo-zipabox-updater": "./netatmo-zipabox-updater.js"
   },
   "jshintConfig": {
     "esversion": 6
