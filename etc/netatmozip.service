@@ -7,11 +7,11 @@ User=<user>
 Group=<group>
 Type=simple
 Environment=NETATMO_VERBOSE=0
-Environment=NETATMO_GRANT_TYPE="password"
-Environment=NETATMO_USERNAME="<username>"
-Environment=NETATMO_PASSWORD="<password>"
-Environment=NETATMO_CLIENT_ID="<client_id>"
-Environment=NETATMO_CLIENT_SECRET="<client_secret>"
+Environment=NETATMO_GRANT_TYPE=password
+Environment=NETATMO_USERNAME=<username>
+Environment=NETATMO_PASSWORD=<password>
+Environment=NETATMO_CLIENT_ID=<client_id>
+Environment=NETATMO_CLIENT_SECRET=<client_secret>
 Environment=NETATMO_REQ_INTERVAL=60
 ExecStart=/usr/local/bin/netatmo-zipabox-updater
 RestartSec=10
