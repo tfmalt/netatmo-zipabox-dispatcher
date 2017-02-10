@@ -20,7 +20,7 @@ log.remove(log.transports.Console);
 log.add(log.transports.Console, {
     level: (process.env.NETATMO_VERBOSE == 1) ? "debug" : "info",
     prettyPrint: true,
-    colorize: true,
+    colorize: false,
     silent: false,
     timestamp: false
 });
