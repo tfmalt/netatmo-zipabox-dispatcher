@@ -24,7 +24,6 @@ log.add(log.transports.Console, {
     silent: false,
     timestamp: false
 });
-log.cli();
 log.info("Starting Netatmo Zipabox Dispatcher v" + pkg.version);
 log.debug("  Log level debug");
 
