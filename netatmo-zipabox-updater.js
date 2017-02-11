@@ -55,7 +55,9 @@ zip.sendUpdate = function(data) {
 };
 
 netatmo.on("update", (data) => {
-    if (typeof(data.body.devices) === "undefined") {
+    log.debug("netatmo: on update data:", data);
+    
+    if (typeof(data) === "undefined") {
         log.error("netatmo: got undefined data:", data);
         return;
     }
@@ -69,7 +71,6 @@ netatmo.on("update", (data) => {
         "netatmo: got data from", room.module_name,
         ", temp:", room.dashboard_data.Temperature,
         ", currentTemp:", netatmo.currentTemp
-
     );
 
     if (room.dashboard_data.Temperature != netatmo.currentTemp) {
