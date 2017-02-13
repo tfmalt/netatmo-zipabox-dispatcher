@@ -41,7 +41,7 @@ const zip = {};
 zip.sendUpdate = function(data) {
     let url = zip._getUrl(data);
 
-    log.debug("zipabox: preparing to update -", url);
+    // log.debug("zipabox: preparing to update -", url);
     request.get(url, (error, response, body) => {
         log.log('info', `zipabox: did update: ${response.statusCode}`, body);
         if (response.statusCode == 200) {
@@ -58,9 +58,9 @@ zip._getUrl = function (data) {
     }
 
     for (let module of data.modules) {
-        log.debug("_getUrl: module:", module.module_name);
-        log.debug("_getUrl: zipcfg.modules:", zipcfg.modules);
+        log.debug("zip._getUrl: module:", module.module_name);
         if (zipcfg.modules.hasOwnProperty(module.module_name)) {
+            log.debug("zip._getUrl: Found", module.module_name);
             let variables = zipcfg.modules[module.module_name];
             for (let key in variables) {
                 url += "&" + variables[key] + "=" + module.dashboard_data[key];
@@ -90,9 +90,7 @@ netatmo.on("update", (data) => {
         ", current temp:", netatmo.currentTemp
     );
 
-    if (room.dashboard_data.Temperature != netatmo.currentTemp) {
-        zip.sendUpdate(room);
-    }
+    zip.sendUpdate(room);
 });
 
 netatmo.start();
