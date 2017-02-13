@@ -18,34 +18,41 @@ const request = require("request");
 
 log.remove(log.transports.Console);
 log.add(log.transports.Console, {
-    level: (process.env.NETATMO_VERBOSE == 1) ? "debug" : "info",
+    level:       (process.env.NETATMO_VERBOSE == 1) ? "debug" : "info",
     prettyPrint: true,
-    colorize: false,
-    silent: false,
-    timestamp: false
+    colorize:    false,
+    silent:      false,
+    timestamp:   false
 });
 log.info("Starting Netatmo Zipabox Dispatcher v" + pkg.version);
 log.debug("  Log level debug");
 
 const netatmo = new nc.NetatmoController({
-    verbose: (process.env.NETATMO_VERBOSE == 1) ? true : false,
-    interval: process.env.NETATMO_REQ_INTERVAL || 30,
-    grant_type: process.env.NETATMO_GRANT_TYPE,
-    username: process.env.NETATMO_USERNAME,
-    password: process.env.NETATMO_PASSWORD,
-    client_id: process.env.NETATMO_CLIENT_ID,
+    verbose:       (process.env.NETATMO_VERBOSE == 1) ? true : false,
+    interval:      process.env.NETATMO_REQ_INTERVAL || 30,
+    grant_type:    process.env.NETATMO_GRANT_TYPE,
+    username:      process.env.NETATMO_USERNAME,
+    password:      process.env.NETATMO_PASSWORD,
+    client_id:     process.env.NETATMO_CLIENT_ID,
     client_secret: process.env.NETATMO_CLIENT_SECRET
 });
 
 const zip = {};
 zip.sendUpdate = function(data) {
-    let url = zipcfg.baseurl + "&" +
-        zipcfg.Temperature + "=" + data.Temperature + "&" +
-        zipcfg.Pressure + "=" + data.Pressure + "&" +
-        zipcfg.Noise + "=" + data.Noise + "&" +
-        zipcfg.Humidity + "=" + data.Humidity + "&" +
-        zipcfg.CO2 + "=" + data.CO2;
+    let url = zipcfg.baseurl;
+    for (let key in zipcfg.station) {
+        url += "&" + key + "=" + data.dashboard_data[key];
+    }
 
+    for (let module in data.modules) {
+        if (zipcfg.modules.hasOwnProperty(module.module_name)) {
+            for (let key in zipcfg.modules[module.module_name]) {
+                url += "&" + key + "=" + data.modules.dashboard_data[key];
+            }
+        }
+    }
+
+    log.debug("zipabox: preparing to update -", url);
     request.get(url, (error, response, body) => {
         log.log('info', `zipabox: did update: ${response.statusCode}`, body);
         if (response.statusCode == 200) {
@@ -56,7 +63,7 @@ zip.sendUpdate = function(data) {
 
 netatmo.on("update", (data) => {
     log.debug("netatmo: on update data:", data);
-    
+
     if (typeof(data) === "undefined") {
         log.error("netatmo: got undefined data:", data);
         return;
@@ -69,18 +76,13 @@ netatmo.on("update", (data) => {
 
     log.info(
         "netatmo: got data from", room.module_name,
-        ", temp:", room.dashboard_data.Temperature,
-        ", currentTemp:", netatmo.currentTemp
+        ", new temp:", room.dashboard_data.Temperature,
+        ", current temp:", netatmo.currentTemp
     );
 
     if (room.dashboard_data.Temperature != netatmo.currentTemp) {
-        zip.sendUpdate(room.dashboard_data);
+        zip.sendUpdate(room);
     }
-});
-
-netatmo.on("access_token", (data) => {
-    log.info("got access token: success");
-    log.debug(data);
 });
 
 netatmo.start();
