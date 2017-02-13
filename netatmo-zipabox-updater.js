@@ -39,18 +39,7 @@ const netatmo = new nc.NetatmoController({
 
 const zip = {};
 zip.sendUpdate = function(data) {
-    let url = zipcfg.baseurl;
-    for (let key in zipcfg.station) {
-        url += "&" + key + "=" + data.dashboard_data[key];
-    }
-
-    for (let module in data.modules) {
-        if (zipcfg.modules.hasOwnProperty(module.module_name)) {
-            for (let key in zipcfg.modules[module.module_name]) {
-                url += "&" + key + "=" + data.modules.dashboard_data[key];
-            }
-        }
-    }
+    let url = zip._getUrl(data);
 
     log.debug("zipabox: preparing to update -", url);
     request.get(url, (error, response, body) => {
@@ -59,6 +48,26 @@ zip.sendUpdate = function(data) {
             netatmo.currentTemp = data.Temperature;
         }
     });
+};
+
+zip._getUrl = function (data) {
+    let url = zipcfg.baseurl;
+
+    for (let key in zipcfg.station) {
+        url += "&" + zipcfg.station[key] + "=" + data.dashboard_data[key];
+    }
+
+    for (let module in data.modules) {
+        log.debug("_getUrl: module:", module);
+        if (zipcfg.modules.hasOwnProperty(module.module_name)) {
+            let variables = zipcfg.modules[module.module_name];
+            for (let key in variables) {
+                url += "&" + variables[key] + "=" + module.dashboard_data[key];
+            }
+        }
+    }
+
+    return url;
 };
 
 netatmo.on("update", (data) => {
