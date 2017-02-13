@@ -58,7 +58,8 @@ zip._getUrl = function (data) {
     }
 
     for (let module in data.modules) {
-        log.debug("_getUrl: module:", module);
+        log.debug("_getUrl: module:", module.module_name);
+        log.debug("_getUrl: zipcfg.modules:", zipcfg.modules);
         if (zipcfg.modules.hasOwnProperty(module.module_name)) {
             let variables = zipcfg.modules[module.module_name];
             for (let key in variables) {
