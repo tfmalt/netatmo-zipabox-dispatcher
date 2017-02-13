@@ -57,7 +57,7 @@ zip._getUrl = function (data) {
         url += "&" + zipcfg.station[key] + "=" + data.dashboard_data[key];
     }
 
-    for (let module in data.modules) {
+    for (let module of data.modules) {
         log.debug("_getUrl: module:", module.module_name);
         log.debug("_getUrl: zipcfg.modules:", zipcfg.modules);
         if (zipcfg.modules.hasOwnProperty(module.module_name)) {
