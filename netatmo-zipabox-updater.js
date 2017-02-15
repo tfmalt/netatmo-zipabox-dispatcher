@@ -42,12 +42,17 @@ zip.sendUpdate = function(data) {
     let url = zip._getUrl(data);
 
     // log.debug("zipabox: preparing to update -", url);
-    request.get(url, (error, response, body) => {
-        log.log('info', `zipabox: did update: ${response.statusCode}`, body);
-        if (response.statusCode == 200) {
-            netatmo.currentTemp = data.dashboard_data.Temperature;
-        }
-    });
+    request
+        .get(url)
+        .on('response', (response) => {
+            log.info(`zipabox: did update: ${response.statusCode}`, response);
+            if (response.statusCode == 200) {
+                netatmo.currentTemp = data.dashboard_data.Temperature;
+            }
+        })
+        .on('error', (error) => {
+            log.error("zipabox: sendUpdate got error: ", error);
+        });
 };
 
 zip._getUrl = function (data) {
