@@ -41,7 +41,6 @@ const zip = {};
 zip.sendUpdate = function(data) {
     let url = zip._getUrl(data);
 
-    // log.debug("zipabox: preparing to update -", url);
     request
         .get(url)
         .on('response', (response) => {
