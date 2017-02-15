@@ -41,20 +41,19 @@ const zip = {};
 zip.sendUpdate = function(data) {
     let url = zip._getUrl(data);
 
-    request
-        .get(url)
-        .on('response', (response, body) => {
+    request.get(url, (error, response, body) => {
+        if (error) {
+            log.error("zipabox: sendUpdate got error: ", error);
+            return;
+        }
+
+        if (response && body) {
             log.info(`zipabox: sendUpdate response: ${response.statusCode}`, body);
             if (response.statusCode == 200) {
                 netatmo.currentTemp = data.dashboard_data.Temperature;
             }
-        })
-        .on('error', (error) => {
-            log.error("zipabox: sendUpdate got error: ", error);
-        })
-        .on('end', (body) => {
-            log.error("zipabox: got end request", body);
-        });
+        }
+    });
 };
 
 zip._getUrl = function (data) {
