@@ -43,14 +43,17 @@ zip.sendUpdate = function(data) {
 
     request
         .get(url)
-        .on('response', (response) => {
-            log.info(`zipabox: did update: ${response.statusCode}`, response);
+        .on('response', (response, body) => {
+            log.info(`zipabox: sendUpdate response: ${response.statusCode}`, body);
             if (response.statusCode == 200) {
                 netatmo.currentTemp = data.dashboard_data.Temperature;
             }
         })
         .on('error', (error) => {
             log.error("zipabox: sendUpdate got error: ", error);
+        })
+        .on('end', (body) => {
+            log.error("zipabox: got end request", body);
         });
 };
 
